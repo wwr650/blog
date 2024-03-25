@@ -27,3 +27,7 @@
 # - type: stack-overflow
 #   icon: 'fab fa-stack-overflow'
 #   url:  ''                  # Fill with your stackoverflow homepage
+
+- type: gitee
+  icon: "fa-github-alt"
+  url: 'https://gitee.com/WWR650'

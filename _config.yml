@@ -46,6 +46,7 @@ social:
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
+    - https://gitee.com/WWR650
 
 google_site_verification: # fill in to your verification string
 
@@ -95,15 +96,15 @@ comments:
     repo: # <gh-username>/<repo>
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
-#  giscus:
-#    repo: wwr650/wwr650.github.io
-#    repo_id: R_kgDOJltMow
-#    category: Q&A
-#    category_id: DIC_kwDOJltMo84CaOcz
-#    mapping: # optional, default to 'pathname'
-#    input_position: # optional, default to 'bottom'
-#    lang: # optional, default to the value of `site.lang`
-#    reactions_enabled: # optional, default to the value of `1`
+  giscus:
+    repo: wwr650/wwr650.github.io
+    repo_id: R_kgDOLkqbhA
+    category: Q&A
+    category_id: DIC_kwDOLkqbhM4CeMgq
+    mapping: # optional, default to 'pathname'
+    input_position: # optional, default to 'bottom'
+    lang: # optional, default to the value of `site.lang`
+    reactions_enabled: # optional, default to the value of `1`
 
 # Self-hosted static assets, optional › https://github.com/cotes2020/chirpy-static-assets
 assets:
