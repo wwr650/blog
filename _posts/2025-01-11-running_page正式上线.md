@@ -1,6 +1,5 @@
 ---
 title: 个人Running_page正式上线
-author: wwr650
 date: 2025-01-11
 categories: [博客 , 通知]
 tags: [跑步]     # TAG names should always be lowercase
