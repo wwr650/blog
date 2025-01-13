@@ -29,5 +29,9 @@
 #   url:  ''                  # Fill with your stackoverflow homepage
 
 - type: gitee
-  icon: "fab fa-code-compare"
+  icon: "fas fa-code-compare"
   url: 'https://gitee.com/WWR650'
+
+- type: running_page
+  icon: "fas fa-person-running"
+  url: 'https://wwr650.github.io/running_page/'
