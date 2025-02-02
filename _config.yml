@@ -18,9 +18,9 @@ timezone: Asia/Shanghai
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: smallw's blog # the main title
+title: smallw # the main title
 
-tagline: 小王的快乐小屋 # it will display as the sub-title
+tagline: 乱七八糟 # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   code, paper, blog; python, pytorch, transformers
