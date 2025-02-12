@@ -1,5 +1,5 @@
 ---
-title: 音乐解密（unlock-music）成功部署，正式上线.md
+title: 音乐解密（unlock-music）成功部署，正式上线
 date: 2025-02-10
 categories: [通知]
 tags: [工具]
