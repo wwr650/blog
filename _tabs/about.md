@@ -2,7 +2,7 @@
 #关于
 # the default layout is 'page'
 icon: fas fa-info-circle
-order: 4
+order: 5
 ---
 
 > 如果您觉得博客对您有帮助，欢迎给我的GitHub关注+多多star
