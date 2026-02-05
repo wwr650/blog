@@ -201,13 +201,13 @@ jekyll-archives:
     category: /categories/:name/
 
 
-url: "https://xiaowang2004.xyz"  # 或者你的自定义域名
+url: "https://wwr650.github.io/blog/"  # 或者你的自定义域名
 baseurl: ""  # 如果部署在根目录，保持为空
 
 # Sitemap 配置
 sitemap:
   # 确保生成完整的 URL
-  url: "https://xiaowang2004.xyz"  # 与上面的 url 一致
+  url: "https://wwr650.github.io/blog/"  # 与上面的 url 一致
   exclude:
     - "/404.html"
   include:
