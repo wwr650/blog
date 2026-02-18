@@ -4,7 +4,7 @@ const https = require('https');
 
 const CONFIG = {
   sitemapUrl: 'https://wwr650.github.io/blog/sitemap.xml',
-  host: 'wwr650.github.io/blog',
+  host: 'wwr650.github.io',
   key: process.env.INDEXNOW_KEY || '6d179929c651445ba9847b00127de657',
   indexnowUrl: 'https://api.indexnow.org/IndexNow'
 };
