@@ -109,6 +109,17 @@ jobs:
         id: pages
         uses: actions/configure-pages@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Build CSS vendors (generate _sass/vendors/_bootstrap.scss)
+        run: |
+          npm install --no-fund --no-audit
+          npm run build:css
+
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
