@@ -1,9 +1,11 @@
-import { defineConfig, globalIgnores } from 'eslint/config';
+import { defineConfig } from 'eslint/config';
 import js from '@eslint/js';
 import globals from 'globals';
 
 export default defineConfig([
-  globalIgnores(['assets/*', 'node_modules/*', '_site/*']),
+  {
+    ignores: ['assets', 'node_modules', '_site', '.github', 'assets/js/dist'],
+  },
   js.configs.recommended,
   {
     rules: {
