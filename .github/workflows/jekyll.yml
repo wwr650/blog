@@ -36,39 +36,61 @@ jobs:
         with:
           fetch-depth: 0  # 👈 需要完整的 Git 历史来获取修改时间
 
-      # 👇 新增：更新文章的 last_modified_at
-      - name: Update last_modified_at for posts
+      # 👇 仅更新本次提交中被修改文章的 last_modified_at
+      - name: Update last_modified_at for changed posts
         run: |
-          echo "Updating last_modified_at for all posts..."
-          for file in _posts/*.md _posts/*.markdown; do
+          echo "🔍 Checking for changed posts..."
+
+          PREV_SHA="${{ github.event.before }}"
+          if [ "$PREV_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$PREV_SHA" ]; then
+            # 首次提交或手动触发：检查所有 _posts 文件
+            echo "First commit or manual trigger, scanning all posts..."
+            changed_files=$(find _posts/ \( -name "*.md" -o -name "*.markdown" \) -type f 2>/dev/null || true)
+          else
+            # 正常推送：只处理本次修改的文件
+            echo "Checking posts modified between $PREV_SHA and ${{ github.sha }}..."
+            changed_files=$(git diff --name-only --diff-filter=M "$PREV_SHA" "${{ github.sha }}" -- _posts/ || true)
+          fi
+
+          if [ -z "$changed_files" ]; then
+            echo "✅ No posts to update."
+            exit 0
+          fi
+
+          echo "📝 Changed posts:"
+          echo "$changed_files"
+
+          echo "$changed_files" | while IFS= read -r file; do
             if [ -f "$file" ]; then
-              # 获取文件的最后 Git 修改时间（ISO 8601 格式）
-              lastmod=$(git log -1 --format="%cd" --date=iso -- "$file" | sed 's/ /T/' | sed 's/+.*/+0800/')
+              lastmod=$(git log -1 --format="%ci" -- "$file")
               if [ -n "$lastmod" ]; then
-                # 如果已有 last_modified_at 字段，更新它
+                echo "  → $file"
                 if grep -q "^last_modified_at:" "$file"; then
                   sed -i "s/^last_modified_at:.*/last_modified_at: $lastmod/" "$file"
-                  echo "  ✅ Updated $file -> $lastmod"
+                  echo "    ✓ Updated: $lastmod"
                 else
-                  # 否则在 date 后面插入 last_modified_at
                   sed -i "/^date:/a last_modified_at: $lastmod" "$file"
-                  echo "  ➕ Added last_modified_at to $file -> $lastmod"
+                  echo "    ✓ Added: $lastmod"
                 fi
-              else
-                echo "  ⚠️  No Git history for $file, skipping..."
               fi
             fi
           done
 
-      # 👇 新增：提交更新后的文件（可选）
+          echo "✅ All done!"
+
+      # 👇 提交已更新的 last_modified_at
       - name: Commit updated last_modified_at (if changed)
         run: |
           if [[ -n $(git status _posts/ -s) ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add _posts/
-            git commit -m "chore: auto-update last_modified_at [skip ci]" || echo "No changes to commit"
-            git push
+            if git commit -m "chore: auto-update last_modified_at [skip ci]"; then
+              echo "✅ Committed changes, pushing..."
+              git push origin main
+            else
+              echo "No changes to commit"
+            fi
           else
             echo "No changes to last_modified_at"
           fi
