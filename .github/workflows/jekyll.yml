@@ -113,7 +113,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
       - name: Build CSS vendors (generate _sass/vendors/_bootstrap.scss)
         run: |
