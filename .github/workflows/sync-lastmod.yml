@@ -1,0 +1,82 @@
+# 手动运行：根据 Git 提交时间，批量同步所有推文的 last_modified_at
+name: Sync last_modified_at for all posts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-lastmod:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 需要完整 Git 历史获取修改时间
+
+      - name: Sync last_modified_at for all posts
+        run: |
+          echo "🔍 Scanning all posts..."
+
+          # 列出所有已跟踪的推文（比 find 更精确，只包含 Git 管理的文件）
+          all_posts=$(git -c core.quotepath=false ls-files '_posts/*.md' '_posts/*.markdown' 2>/dev/null || true)
+
+          if [ -z "$all_posts" ]; then
+            echo "❌ No posts found."
+            exit 0
+          fi
+
+          updated_count=0
+          skipped_count=0
+
+          echo "$all_posts" | while IFS= read -r file; do
+            if [ ! -f "$file" ]; then
+              continue
+            fi
+
+            # 获取该文件的最新 Git 提交时间
+            lastmod=$(git log -1 --format="%ci" -- "$file" 2>/dev/null || true)
+
+            if [ -z "$lastmod" ]; then
+              echo "  ⚠ Skipped (no git history): $file"
+              continue
+            fi
+
+            echo "  → $file"
+
+            if grep -q "^last_modified_at:" "$file"; then
+              # 已存在，更新
+              old_val=$(grep "^last_modified_at:" "$file" | sed 's/^last_modified_at:[[:space:]]*//')
+              sed -i "s/^last_modified_at:.*/last_modified_at: $lastmod/" "$file"
+              echo "    ✓ Updated: $old_val → $lastmod"
+            else
+              # 不存在，在 date: 后追加
+              sed -i "/^date:/a last_modified_at: $lastmod" "$file"
+              echo "    ✓ Added: $lastmod"
+            fi
+
+            updated_count=$((updated_count + 1))
+          done
+
+          echo ""
+          echo "✅ Sync complete!"
+
+      - name: Commit changes (if any)
+        run: |
+          if [[ -n $(git status _posts/ -s) ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add _posts/
+            if git commit -m "chore: sync last_modified_at for all posts [skip ci]"; then
+              echo "✅ Committed changes, pushing..."
+              git push origin main
+            else
+              echo "No changes to commit"
+            fi
+          else
+            echo "No changes to last_modified_at"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
