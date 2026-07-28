@@ -47,9 +47,9 @@ jobs:
             echo "First commit or manual trigger, scanning all posts..."
             changed_files=$(find _posts/ \( -name "*.md" -o -name "*.markdown" \) -type f 2>/dev/null || true)
           else
-            # 正常推送：只处理本次修改的文件
-            echo "Checking posts modified between $PREV_SHA and ${{ github.sha }}..."
-            changed_files=$(git diff --name-only --diff-filter=M "$PREV_SHA" "${{ github.sha }}" -- _posts/ || true)
+            # 正常推送：只处理本次新增和修改的文件
+            echo "Checking posts added/modified between $PREV_SHA and ${{ github.sha }}..."
+            changed_files=$(git -c core.quotepath=false diff --name-only --diff-filter=AM "$PREV_SHA" "${{ github.sha }}" -- _posts/ || true)
           fi
 
           if [ -z "$changed_files" ]; then
