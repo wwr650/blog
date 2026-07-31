@@ -1,25 +1,64 @@
 name: Submit URLs to IndexNow
 
 on:
+  # _posts 目录有新内容推送时自动执行（含新文章、修改文章）
+  push:
+    branches: ["main"]
+    paths:
+      - "_posts/**"
+  # 手动触发：全量提交所有文章链接（兜底）
   workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
 
 jobs:
   submit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          node-version: '18'
-      
+          fetch-depth: 0 # 需要完整 Git 历史来对比本次新增的文章
+
+      # 仅当本次推送存在【新增】文章时才提交，修改旧文章（如 last_modified_at）时跳过
+      - name: Check for new posts
+        id: check
+        run: |
+          PREV_SHA="${{ github.event.before }}"
+
+          if [ -z "$PREV_SHA" ] || [ "$PREV_SHA" = "0000000000000000000000000000000000000000" ]; then
+            # 手动触发或首次提交：扫描全部文章
+            echo "Manual trigger detected, scanning all posts..."
+            new_files=$(find _posts/ \( -name "*.md" -o -name "*.markdown" \) -type f 2>/dev/null || true)
+          else
+            # 推送触发：仅本次新增的文章
+            echo "Checking posts added between $PREV_SHA and ${{ github.sha }}..."
+            new_files=$(git -c core.quotepath=false diff --name-only --diff-filter=A "$PREV_SHA" "${{ github.sha }}" -- _posts/ || true)
+          fi
+
+          if [ -z "$new_files" ]; then
+            echo "✅ No new posts detected, skipping IndexNow submission."
+            echo "has_new_posts=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "📝 New posts found:"
+            echo "$new_files"
+            echo "has_new_posts=true" >> "$GITHUB_OUTPUT"
+            echo "$new_files" > new_posts.txt
+          fi
+
+      - name: Setup Node.js
+        if: steps.check.outputs.has_new_posts == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install dependencies
+        if: steps.check.outputs.has_new_posts == 'true'
         run: npm install xml2js axios
-      
+
       - name: Run submission script
+        if: steps.check.outputs.has_new_posts == 'true'
         env:
           INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
-        run: node .github/scripts/submit-to-indexnow.js
+        run: node .github/scripts/submit-to-indexnow.cjs --posts new_posts.txt
