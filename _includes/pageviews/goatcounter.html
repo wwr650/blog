@@ -24,7 +24,6 @@
         .finally(() => clearTimeout(timer));
     };
 
-    // 文章页：统计当前文章的访问量
     const pv = document.getElementById('pageviews');
 
     if (pv !== null) {
@@ -32,7 +31,6 @@
       fetchCount(`${base}${encodeURIComponent(uri)}.json`, pv);
     }
 
-    // 主页：统计主页自身的访问量（固定取 baseurl 路径，不受分页影响）
     const homePv = document.getElementById('home-pageviews');
 
     if (homePv !== null) {
@@ -40,7 +38,6 @@
       fetchCount(`${base}${encodeURIComponent(uri)}.json`, homePv);
     }
 
-    // 主页：统计全站总访问量（TOTAL 为 GoatCounter 保留路径，区分大小写）
     const sitePv = document.getElementById('site-pageviews');
 
     if (sitePv !== null) {
