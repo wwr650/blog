@@ -4,15 +4,24 @@
     const base = `https://{{ site.analytics.goatcounter.id }}.goatcounter.com/counter/`;
 
     const fetchCount = (url, el) => {
-      fetch(url)
-        .then((response) => response.json())
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+
+      fetch(url, { signal: controller.signal })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.json();
+        })
         .then((data) => {
           const count = data.count.replace(/\D/g, '');
           el.innerText = new Intl.NumberFormat().format(count);
         })
         .catch((error) => {
           el.innerText = '1';
-        });
+        })
+        .finally(() => clearTimeout(timer));
     };
 
     // 文章页：统计当前文章的访问量
@@ -31,11 +40,11 @@
       fetchCount(`${base}${encodeURIComponent(uri)}.json`, homePv);
     }
 
-    // 主页：统计全站总访问量
+    // 主页：统计全站总访问量（TOTAL 为 GoatCounter 保留路径，区分大小写）
     const sitePv = document.getElementById('site-pageviews');
 
     if (sitePv !== null) {
-      fetchCount(`${base}total.json`, sitePv);
+      fetchCount(`${base}TOTAL.json`, sitePv);
     }
   });
 </script>
