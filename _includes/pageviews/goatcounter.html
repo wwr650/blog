@@ -1,21 +1,41 @@
 <!-- Display GoatCounter pageviews -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const pv = document.getElementById('pageviews');
+    const base = `https://{{ site.analytics.goatcounter.id }}.goatcounter.com/counter/`;
 
-    if (pv !== null) {
-      const uri = location.pathname.replace(/\/$/, '');
-      const url = `https://{{ site.analytics.goatcounter.id }}.goatcounter.com/counter/${encodeURIComponent(uri)}.json`;
-
+    const fetchCount = (url, el) => {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
           const count = data.count.replace(/\D/g, '');
-          pv.innerText = new Intl.NumberFormat().format(count);
+          el.innerText = new Intl.NumberFormat().format(count);
         })
         .catch((error) => {
-          pv.innerText = '1';
+          el.innerText = '1';
         });
+    };
+
+    // 文章页：统计当前文章的访问量
+    const pv = document.getElementById('pageviews');
+
+    if (pv !== null) {
+      const uri = location.pathname.replace(/\/$/, '');
+      fetchCount(`${base}${encodeURIComponent(uri)}.json`, pv);
+    }
+
+    // 主页：统计主页自身的访问量（固定取 baseurl 路径，不受分页影响）
+    const homePv = document.getElementById('home-pageviews');
+
+    if (homePv !== null) {
+      const uri = '{{ site.baseurl | default: "" }}' || '/';
+      fetchCount(`${base}${encodeURIComponent(uri)}.json`, homePv);
+    }
+
+    // 主页：统计全站总访问量
+    const sitePv = document.getElementById('site-pageviews');
+
+    if (sitePv !== null) {
+      fetchCount(`${base}total.json`, sitePv);
     }
   });
 </script>

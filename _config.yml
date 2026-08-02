@@ -62,6 +62,13 @@ webmaster_verifications:
 analytics:
   google:
     id: G-9H0ZT7SDL4 # fill in your Google Analytics ID
+  goatcounter:
+    id: xiaowang # 注册 GoatCounter 后填入你的站点 ID，如 'smallw' › https://www.goatcounter.com/signup
+
+# Pageviews Settings
+# 浏览量统计（每篇文章单独统计 + 主页统计），provider 需配合上方 analytics.goatcounter.id 使用
+pageviews:
+  provider: goatcounter # [goatcounter]
 
 # Prefer color scheme setting.
 #

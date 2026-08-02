@@ -71,7 +71,7 @@
 {% endif %}
 
 <!-- Pageviews -->
-{% if page.layout == 'post' %}
+{% if page.layout == 'post' or page.layout == 'home' %}
   {% assign provider = site.pageviews.provider %}
 
   {% if provider and provider != empty %}
