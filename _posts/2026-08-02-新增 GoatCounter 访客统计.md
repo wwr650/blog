@@ -4,7 +4,7 @@ date: 2026-08-02
 categories: 站务
 tags: 通知
 description: 新增 GoatCounter 访客统计
-last_modified_at: 2026-08-02 16:05:25
+last_modified_at: 2026-08-02 16:08:48 +0800
 ---
 
 ## 新增 GoatCounter 访客统计
