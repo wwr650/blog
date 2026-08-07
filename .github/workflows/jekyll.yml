@@ -118,6 +118,10 @@ jobs:
         run: |
           npm install --no-fund --no-audit
           npm run build:css
+          # Rebuild JS bundles so that sw.min.js gets a fresh build
+          # timestamp, which forces browsers to detect the service
+          # worker update after each deploy.
+          npm run build:js
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default

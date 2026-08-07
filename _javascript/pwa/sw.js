@@ -66,27 +66,42 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip cross-origin requests (e.g. analytics, comments and pageviews)
+  // to let the browser handle them directly, avoiding network errors
+  // being reported by the service worker.
+  const requestUrl = new URL(event.request.url);
+
+  if (requestUrl.origin !== self.location.origin) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
         return response;
       }
 
-      return fetch(event.request).then((response) => {
-        const url = event.request.url;
+      return fetch(event.request)
+        .then((response) => {
+          const url = event.request.url;
 
-        if (purge || event.request.method !== 'GET' || !verifyUrl(url)) {
+          if (purge || event.request.method !== 'GET' || !verifyUrl(url)) {
+            return response;
+          }
+
+          // See: <https://developers.google.com/web/fundamentals/primers/service-workers#cache_and_return_requests>
+          let responseToCache = response.clone();
+
+          caches.open(swconf.cacheName).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
           return response;
-        }
-
-        // See: <https://developers.google.com/web/fundamentals/primers/service-workers#cache_and_return_requests>
-        let responseToCache = response.clone();
-
-        caches.open(swconf.cacheName).then((cache) => {
-          cache.put(event.request, responseToCache);
+        })
+        .catch(() => {
+          // Network error, respond with an empty response to avoid
+          // an unhandled promise rejection.
+          return new Response('', { status: 504, statusText: 'Gateway Timeout' });
         });
-        return response;
-      });
     })
   );
 });

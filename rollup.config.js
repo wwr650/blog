@@ -51,7 +51,10 @@ function build(
       file: `${DIST}/${filename}.min.js`,
       format: 'iife',
       ...(outputName !== null && { name: outputName }),
-      banner,
+      // Inject the build timestamp into sw.min.js so that its content
+      // always changes on every build, allowing browsers to detect
+      // service worker updates (and clear stale caches) after deploy.
+      banner: filename === 'sw' ? `${banner}\n/*! build ${Date.now()} */` : banner,
       sourcemap: !isProd && !jekyll
     },
     ...(shouldWatch && { watch: { include: `${SRC_DEFAULT}/**/*.js` } }),

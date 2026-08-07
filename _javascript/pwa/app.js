@@ -13,6 +13,12 @@ if ('serviceWorker' in navigator) {
     const popupWindow = Toast.getOrCreateInstance($notification);
 
     navigator.serviceWorker.register(swUrl).then((registration) => {
+      // Periodically check for updates so that already-open pages can
+      // also detect a new version and show the update notification.
+      setInterval(() => {
+        registration.update().catch(() => {});
+      }, 60 * 1000);
+
       // Restore the update window that was last manually closed by the user
       if (registration.waiting) {
         popupWindow.show();
