@@ -4,7 +4,7 @@ import globals from 'globals';
 
 export default defineConfig([
   {
-    ignores: ['assets', 'node_modules', '_site', '.github', 'assets/js/dist'],
+    ignores: ['assets', 'node_modules', 'vendor', '_site', '.github', 'assets/js/dist'],
   },
   js.configs.recommended,
   {
